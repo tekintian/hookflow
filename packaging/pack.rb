@@ -4,7 +4,7 @@ require "fileutils"
 require "digest"
 require "open-uri"
 
-VERSION = "1.1.1"
+VERSION = "1.0.0"
 
 ROOT = File.join(__dir__, "..")
 DIST = File.join(ROOT, "dist")
@@ -112,16 +112,16 @@ module Pack
     end
 
     {
-      "#{DIST}/no_self_update_linux_amd64_v1/hookflow"         =>  "pypi/hookflow_tekintian/bin/hookflow-linux-x86_64/hookflow",
-      "#{DIST}/no_self_update_linux_arm64_v8.0/hookflow"       =>  "pypi/hookflow_tekintian/bin/hookflow-linux-arm64/hookflow",
-      "#{DIST}/no_self_update_freebsd_amd64_v1/hookflow"       =>  "pypi/hookflow_tekintian/bin/hookflow-freebsd-x86_64/hookflow",
-      "#{DIST}/no_self_update_freebsd_arm64_v8.0/hookflow"     =>  "pypi/hookflow_tekintian/bin/hookflow-freebsd-arm64/hookflow",
-      "#{DIST}/no_self_update_openbsd_amd64_v1/hookflow"       =>  "pypi/hookflow_tekintian/bin/hookflow-openbsd-x86_64/hookflow",
-      "#{DIST}/no_self_update_openbsd_arm64_v8.0/hookflow"     =>  "pypi/hookflow_tekintian/bin/hookflow-openbsd-arm64/hookflow",
-      "#{DIST}/no_self_update_windows_amd64_v1/hookflow.exe"   =>  "pypi/hookflow_tekintian/bin/hookflow-windows-x86_64/hookflow.exe",
-      "#{DIST}/no_self_update_windows_arm64_v8.0/hookflow.exe" =>  "pypi/hookflow_tekintian/bin/hookflow-windows-arm64/hookflow.exe",
-      "#{DIST}/no_self_update_darwin_amd64_v1/hookflow"        =>  "pypi/hookflow_tekintian/bin/hookflow-darwin-x86_64/hookflow",
-      "#{DIST}/no_self_update_darwin_arm64_v8.0/hookflow"      =>  "pypi/hookflow_tekintian/bin/hookflow-darwin-arm64/hookflow",
+      "#{DIST}/no_self_update_linux_amd64_v1/hookflow"         =>  "pypi/hookflow/bin/hookflow-linux-x86_64/hookflow",
+      "#{DIST}/no_self_update_linux_arm64_v8.0/hookflow"       =>  "pypi/hookflow/bin/hookflow-linux-arm64/hookflow",
+      "#{DIST}/no_self_update_freebsd_amd64_v1/hookflow"       =>  "pypi/hookflow/bin/hookflow-freebsd-x86_64/hookflow",
+      "#{DIST}/no_self_update_freebsd_arm64_v8.0/hookflow"     =>  "pypi/hookflow/bin/hookflow-freebsd-arm64/hookflow",
+      "#{DIST}/no_self_update_openbsd_amd64_v1/hookflow"       =>  "pypi/hookflow/bin/hookflow-openbsd-x86_64/hookflow",
+      "#{DIST}/no_self_update_openbsd_arm64_v8.0/hookflow"     =>  "pypi/hookflow/bin/hookflow-openbsd-arm64/hookflow",
+      "#{DIST}/no_self_update_windows_amd64_v1/hookflow.exe"   =>  "pypi/hookflow/bin/hookflow-windows-x86_64/hookflow.exe",
+      "#{DIST}/no_self_update_windows_arm64_v8.0/hookflow.exe" =>  "pypi/hookflow/bin/hookflow-windows-arm64/hookflow.exe",
+      "#{DIST}/no_self_update_darwin_amd64_v1/hookflow"        =>  "pypi/hookflow/bin/hookflow-darwin-x86_64/hookflow",
+      "#{DIST}/no_self_update_darwin_arm64_v8.0/hookflow"      =>  "pypi/hookflow/bin/hookflow-darwin-arm64/hookflow",
     }.each do |(source, dest)|
       mkdir_p(File.dirname(dest))
       cp(source, dest, verbose: true)

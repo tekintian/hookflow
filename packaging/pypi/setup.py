@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name='hookflow-tekintian',
-    version='1.1.1',
+    name='hookflow',
+    version='1.0.0',
     author='Tekintian',
     author_email='tekintian@gmail.com',
     url='https://github.com/tekintian/hookflow',
@@ -19,7 +19,7 @@ setup(
         ],
     },
     package_data={
-        'hookflow_tekintian':[
+        'hookflow':[
             'bin/hookflow-linux-x86_64/hookflow',
             'bin/hookflow-linux-arm64/hookflow',
             'bin/hookflow-freebsd-x86_64/hookflow',

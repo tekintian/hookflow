@@ -1,5 +1,5 @@
 Gem::Specification.new do |spec|
-  spec.name          = "hookflow-tekintian"
+  spec.name          = "hookflow"
   spec.version       = "1.0.0"
   spec.authors       = ["A.A.Abroskin", "Tekintian"]
   spec.email         = ["tekintian@gmail.com"]

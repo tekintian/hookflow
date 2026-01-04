@@ -6,7 +6,7 @@ import (
 	"golang.org/x/mod/semver"
 )
 
-const version = "1.1.1"
+const version = "1.0.0"
 
 var (
 	// Is set via -X github.com/tekintian/hookflow/internal/version.commit={commit}.

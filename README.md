@@ -1,92 +1,69 @@
 ![Build Status](https://github.com/tekintian/hookflow/actions/workflows/test.yml/badge.svg?branch=master)
-[![codecov](https://codecov.io/gh/tekintian/hookflow/graph/badge.svg?token=d93ya8MfmB)](https://codecov.io/gh/tekintian/hookflow)
+[![codecov](https://codecov.io/gh/tekintian/hookflow/graph/badge.svg)](https://codecov.io/gh/tekintian/hookflow)
 
 # Hookflow
 
-<img align="right" width="147" height="100" title="Hookflow logo"
-     src="./logo_sign.svg">
+Git hooks 管理器，适用于 Node.js、Ruby、Python 等各类项目。
 
-A Git hooks manager for Node.js, Ruby, Python and many other types of projects.
+## 特性
 
-* **Fast.** It is written in Go. Can run commands in parallel.
-* **Powerful.** It allows to control execution and files you pass to your commands.
-* **Simple.** It is single dependency-free binary which can work in any environment.
+- **快速** - Go 编写，支持并行执行
+- **强大** - 可精确控制执行逻辑和文件传递
+- **简单** - 单一二进制文件，无依赖
 
-📖 [Introduction post](https://tekintian.com/chronicles/hookflow-knock-your-teams-code-back-into-shape?utm_source=hookflow)
+**说明**: 由于 lefthook 不支持 macOS 10.15，本项目对 lefthook 进行了改造以支持 macOS 10.15，并保留了 lefthook v2.0 的所有功能和配置方式。
 
-<a href="https://tekintian.com/?utm_source=hookflow">
-<img src="https://tekintian.com/badges/sponsored-by-tekintian.svg" alt="Sponsored by Tekintian" width="100%" height="54"></a>
+## 安装
 
-## Install
-
-With **Go** (<= 1.24):
+### Go
 
 ```bash
 go install github.com/tekintian/hookflow/v1@v1.0.0
 ```
 
-* or as a go tool
-
-```bash
-go get -tool github.com/tekintian/hookflow
-```
-
-With **NPM**:
+### NPM
 
 ```bash
 npm install hookflow --save-dev
 ```
 
-For **Ruby**:
+### Ruby
 
 ```bash
 gem install hookflow
 ```
 
-For **Python**:
+### Python
 
 ```bash
 pipx install hookflow
 ```
 
-**[Installation guide][installation]** with more ways to install hookflow: [apt][install-apt], [brew][install-brew], [winget][install-winget], and others.
+更多安装方式: [apt][install-apt], [brew][install-brew], [winget][install-winget] 等。
 
-## Usage
-
-Configure your hooks, install them once and forget about it: rely on the magic underneath.
-
-#### TL;DR
+## 快速开始
 
 ```bash
-# Configure your hooks
+# 配置 hooks
 vim hookflow.yml
 
-# Install them to the git project
+# 安装到 git 项目
 hookflow install
 
-# Enjoy your work with git
+# 正常使用 git
 git add -A && git commit -m '...'
 ```
 
-#### More details
+## 配置示例
 
-- [**Configuration**][configuration] for `hookflow.yml` config options.
-- [**Usage**][usage] for **hookflow** CLI options, and features.
-- [**Discussions**][discussion] for questions, ideas, suggestions.
-<!-- - [**Wiki**](https://github.com/tekintian/hookflow/wiki) for guides, examples, and benchmarks. -->
-
-## Why Hookflow
-
-* ### **Parallel execution**
-Gives you more speed. [docs][config-parallel]
+### 并行执行
 
 ```yml
 pre-push:
   parallel: true
 ```
 
-* ### **Flexible list of files**
-If you want your own list. [Custom][config-files] and [prebuilt][config-run] examples.
+### 文件过滤
 
 ```yml
 pre-commit:
@@ -102,35 +79,31 @@ pre-commit:
       run: yarn stylelint {files}
 ```
 
-* ### **Glob and regexp filters**
-If you want to filter list of files. You could find more glob pattern examples [here](https://github.com/gobwas/glob#example).
+### Glob 过滤
 
 ```yml
 pre-commit:
   jobs:
     - name: lint backend
-      glob: "*.rb" # glob filter
+      glob: "*.rb"
       exclude:
         - "*/application.rb"
         - "*/routes.rb"
       run: bundle exec rubocop --force-exclusion {all_files}
 ```
 
-* ### **Execute in sub-directory**
-If you want to execute the commands in a relative path
+### 子目录执行
 
 ```yml
 pre-commit:
   jobs:
     - name: lint backend
-      root: "api/" # Careful to have only trailing slash
-      glob: "*.rb" # glob filter
+      root: "api/"
+      glob: "*.rb"
       run: bundle exec rubocop {all_files}
 ```
 
-* ### **Run scripts**
-
-If oneline commands are not enough, you can execute files. [docs][config-scripts]
+### 运行脚本
 
 ```yml
 commit-msg:
@@ -139,8 +112,7 @@ commit-msg:
       runner: bash
 ```
 
-* ### **Tags**
-If you want to control a group of commands. [docs][config-tags]
+### 标签控制
 
 ```yml
 pre-push:
@@ -158,9 +130,7 @@ pre-push:
       run: bundle audit
 ```
 
-* ### **Support Docker**
-
-If you are in the Docker environment. [docs][config-run]
+### Docker 支持
 
 ```yml
 pre-commit:
@@ -169,9 +139,7 @@ pre-commit:
       runner: docker run -it --rm <container_id_or_name> {cmd}
 ```
 
-* ### **Local config**
-
-If you are a frontend/backend developer and want to skip unnecessary commands or override something in Docker. [docs][usage-local-config]
+### 本地配置
 
 ```yml
 # hookflow-local.yml
@@ -183,17 +151,7 @@ pre-push:
       skip: true
 ```
 
-* ### **Direct control**
-
-If you want to run hooks group directly.
-
-```bash
-$ hookflow run pre-commit
-```
-
-* ### **Your own tasks**
-
-If you want to run specific group of commands directly.
+### 自定义任务
 
 ```yml
 fixer:
@@ -201,13 +159,10 @@ fixer:
     - run: bundle exec rubocop --force-exclusion --safe-auto-correct {staged_files}
     - run: yarn eslint --fix {staged_files}
 ```
-```bash
-$ hookflow run fixer
-```
 
-* ### **Control output**
+运行: `hookflow run fixer`
 
-You can control what hookflow prints with [output][config-output] option.
+### 输出控制
 
 ```yml
 output:
@@ -215,29 +170,30 @@ output:
   - failure
 ```
 
-----
+## 更多文档
 
-### Guides
+- [配置指南][configuration]
+- [使用文档][usage]
+- [讨论区][discussion]
+- [示例][examples]
 
-* [Install with Node.js][install-node]
-* [Install with Ruby][install-ruby]
-* [Install with Homebrew][install-brew]
-* [Install with Winget][install-winget]
-* [Install for Debian-based Linux][install-apt]
-* [Install for RPM-based Linux][install-rpm]
-* [Install for Arch Linux][install-arch]
-* [Install for Alpine Linux][install-alpine]
-* [Usage][usage]
-* [Configuration][configuration]
-<!-- * [Troubleshooting](https://github.com/tekintian/hookflow/wiki/Troubleshooting) -->
-
-<!-- ### Migrate from -->
-<!-- * [Husky](https://github.com/tekintian/hookflow/wiki/Migration-from-husky) -->
-<!-- * [Husky and lint-staged](https://github.com/tekintian/hookflow/wiki/Migration-from-husky-with-lint-staged) -->
-<!-- * [Overcommit](https://github.com/tekintian/hookflow/wiki/Migration-from-overcommit) -->
-
-### Examples
-
-Check [examples][examples]
-
-[documentation]: https://hookflow.dev/
+[installation]: https://lefthook.dev/guides/installation.html
+[install-apt]: https://lefthook.dev/guides/installation.html#debian-based-linux
+[install-brew]: https://lefthook.dev/guides/installation.html#homebrew
+[install-winget]: https://lefthook.dev/guides/installation.html#winget
+[configuration]: https://lefthook.dev/configuration.html
+[usage]: https://lefthook.dev/usage.html
+[discussion]: https://github.com/tekintian/hookflow/discussions
+[examples]: https://github.com/tekintian/hookflow/tree/main/examples
+[config-parallel]: https://lefthook.dev/configuration.html#parallel
+[config-files]: https://lefthook.dev/configuration.html#files
+[config-run]: https://lefthook.dev/configuration.html#run
+[config-scripts]: https://lefthook.dev/configuration.html#scripts
+[config-tags]: https://lefthook.dev/configuration.html#tags
+[usage-local-config]: https://lefthook.dev/usage.html#local-config
+[config-output]: https://lefthook.dev/configuration.html#output
+[install-node]: https://lefthook.dev/guides/installation.html#nodejs
+[install-ruby]: https://lefthook.dev/guides/installation.html#ruby
+[install-rpm]: https://lefthook.dev/guides/installation.html#rpm-based-linux
+[install-arch]: https://lefthook.dev/guides/installation.html#arch-linux
+[install-alpine]: https://lefthook.dev/guides/installation.html#alpine-linux
