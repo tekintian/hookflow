@@ -1,0 +1,25 @@
+exec git init
+exec hookflow install
+exists .git/hooks/pre-push
+exec hookflow uninstall
+! exists .git/hooks-pre-push
+exists hookflow.yml
+exists .hookflow-local.toml
+
+exec hookflow install
+exists .git/hooks/pre-push
+exec hookflow uninstall --remove-configs
+! exists .git/hooks-pre-push
+! exists hookflow.yml
+! exists .hookflow-local.toml
+
+-- hookflow.yml --
+pre-push:
+  commands:
+    echo:
+      run: echo pre-push
+
+
+-- .hookflow-local.toml --
+[pre-commit.commands.echo]
+run = "echo pre-commit"

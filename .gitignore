@@ -1,0 +1,26 @@
+.vscode/
+.idea/
+/hookflow
+/hookflow-local.yml
+
+tmp/
+dist/
+book/
+bin/
+
+# Packages
+packaging/pypi/hookflow/__pycache__/
+packaging/pypi/hookflow/bin/
+packaging/pypi/hookflow.egg-info/
+packaging/pypi/build/
+packaging/rubygems/pkg/
+packaging/rubygems/libexec/
+packaging/npm-bundled/bin/
+packaging/npm-*/README.md
+packaging/npm/*/bin/
+packaging/npm/*/README.md
+packaging/npm/*/schema.json
+packaging/npm-bundled/schema.json
+packaging/npm-installer/schema.json
+!packaging/npm/*/package.json
+!packaging/npm/hookflow/bin/index.js

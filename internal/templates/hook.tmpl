@@ -1,0 +1,110 @@
+#!/bin/sh
+
+if [ "$HOOKFLOW_VERBOSE" = "1" -o "$HOOKFLOW_VERBOSE" = "true" ]; then
+  set -x
+fi
+
+if [ "$HOOKFLOW" = "0" ]; then
+  exit 0
+fi
+
+{{- if .Rc}}
+{{/* Load rc file, which may export ENV variables */}}
+[ -f {{.Rc}} ] && . {{.Rc}}
+{{- end}}
+
+call_hookflow()
+{
+  if test -n "$HOOKFLOW_BIN"
+  then
+    "$HOOKFLOW_BIN" "$@"
+  {{ if .HookflowPath -}}
+  elif test -n "{{ .HookflowPath }}"
+  then
+    {{ .HookflowPath }} "$@"
+  {{ end -}}
+  elif hookflow{{.Extension}} -h >/dev/null 2>&1
+  then
+    hookflow{{.Extension}} "$@"
+  {{ if .Extension -}}
+  {{/* Check if hookflow.bat exists. Ruby bundler creates such a wrapper */ -}}
+  elif hookflow.bat -h >/dev/null 2>&1
+  then
+    hookflow.bat "$@"
+  {{ end -}}
+  {{ if .HookflowPathCurrent -}}
+  elif {{ .HookflowPathCurrent }} -h >/dev/null 2>&1
+  then
+    {{ .HookflowPathCurrent }} "$@"
+  {{ end -}}
+  else
+    dir="$(git rev-parse --show-toplevel)"
+    osArch=$(uname | tr '[:upper:]' '[:lower:]')
+    cpuArch=$(uname -m | sed 's/aarch64/arm64/;s/x86_64/x64/')
+    if test -f "$dir/node_modules/hookflow-${osArch}-${cpuArch}/bin/hookflow{{.Extension}}"
+    then
+      "$dir/node_modules/hookflow-${osArch}-${cpuArch}/bin/hookflow{{.Extension}}" "$@"
+    elif test -f "$dir/node_modules/@tekintian/hookflow/bin/hookflow-${osArch}-${cpuArch}/hookflow{{.Extension}}"
+    then
+      "$dir/node_modules/@tekintian/hookflow/bin/hookflow-${osArch}-${cpuArch}/hookflow{{.Extension}}" "$@"
+    elif test -f "$dir/node_modules/@tekintian/hookflow-installer/bin/hookflow{{.Extension}}"
+    then
+      "$dir/node_modules/@tekintian/hookflow-installer/bin/hookflow{{.Extension}}" "$@"
+    elif test -f "$dir/node_modules/hookflow/bin/index.js"
+    then
+      "$dir/node_modules/hookflow/bin/index.js" "$@"
+    {{ $extension := .Extension -}}
+    {{ range .Roots -}}
+    elif test -f "$dir/{{.}}/node_modules/hookflow-${osArch}-${cpuArch}/bin/hookflow{{$extension}}"
+    then
+      "$dir/{{.}}/node_modules/hookflow-${osArch}-${cpuArch}/bin/hookflow{{$extension}}" "$@"
+    elif test -f "$dir/{{.}}/node_modules/@tekintian/hookflow/bin/hookflow-${osArch}-${cpuArch}/hookflow{{$extension}}"
+    then
+      "$dir/{{.}}/node_modules/@tekintian/hookflow/bin/hookflow-${osArch}-${cpuArch}/hookflow{{$extension}}" "$@"
+    elif test -f "$dir/{{.}}/node_modules/@tekintian/hookflow-installer/bin/hookflow{{$extension}}"
+    then
+      "$dir/{{.}}/node_modules/@tekintian/hookflow-installer/bin/hookflow{{$extension}}" "$@"
+    elif test -f "$dir/{{.}}/node_modules/hookflow/bin/index.js"
+    then
+      "$dir/{{.}}/node_modules/hookflow/bin/index.js" "$@"
+    {{ end -}}
+    elif go tool hookflow -h >/dev/null 2>&1
+    then
+      go tool hookflow "$@"
+    elif bundle exec hookflow -h >/dev/null 2>&1
+    then
+      bundle exec hookflow "$@"
+    elif yarn hookflow -h >/dev/null 2>&1
+    then
+      yarn hookflow "$@"
+    elif pnpm hookflow -h >/dev/null 2>&1
+    then
+      pnpm hookflow "$@"
+    elif swift package hookflow >/dev/null 2>&1
+    then
+      swift package --build-path .build/hookflow --disable-sandbox hookflow "$@"
+    elif command -v mint >/dev/null 2>&1
+    then
+      mint run csjones/hookflow-plugin "$@"
+    elif uv run hookflow -h >/dev/null 2>&1
+    then
+      uv run hookflow "$@"
+    elif mise exec -- hookflow -h >/dev/null 2>&1
+    then
+      mise exec -- hookflow "$@"
+    elif devbox run hookflow -h >/dev/null 2>&1
+    then
+      devbox run hookflow "$@"
+    else
+      echo "Can't find hookflow in PATH"
+      {{- if .AssertHookflowInstalled}}
+      echo "ERROR: Operation is aborted due to hookflow settings."
+      echo "Make sure hookflow is available in your environment and re-try."
+      echo "To skip these checks use --no-verify git argument or set HOOKFLOW=0 env variable."
+      exit 1
+      {{- end}}
+    fi
+  fi
+}
+
+call_hookflow run "{{.HookName}}" "$@"

@@ -1,0 +1,3 @@
+exec hookflow version
+stdout \d+\.\d+\.\d+
+! stderr .

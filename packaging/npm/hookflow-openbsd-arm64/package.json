@@ -1,0 +1,22 @@
+{
+  "name": "hookflow-openbsd-arm64",
+  "version": "1.0.0",
+  "description": "The OpenBSD ARM 64-bit binary for hookflow, git hooks manager.",
+  "preferUnplugged": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekintian/hookflow.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tekintian/hookflow/issues",
+    "email": "tekintian@gmail.com"
+  },
+  "homepage": "https://github.com/tekintian/hookflow#readme",
+  "os": [
+    "openbsd"
+  ],
+  "cpu": [
+    "arm64"
+  ]
+}

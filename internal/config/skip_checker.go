@@ -1,0 +1,101 @@
+package config
+
+import (
+	"github.com/gobwas/glob"
+
+	"github.com/tekintian/hookflow/v1/internal/git"
+	"github.com/tekintian/hookflow/v1/internal/log"
+	"github.com/tekintian/hookflow/v1/internal/system"
+)
+
+type skipChecker struct {
+	exec *commandExecutor
+}
+
+func NewSkipChecker(cmd system.Command) *skipChecker {
+	return &skipChecker{&commandExecutor{cmd}}
+}
+
+// Check returns the result of applying a skip/only setting which can be a branch, git state, shell command, etc.
+func (sc *skipChecker) Check(state func() git.State, skip any, only any) bool {
+	if skip == nil && only == nil {
+		return false
+	}
+
+	if skip != nil {
+		if sc.matches(state, skip) {
+			return true
+		}
+	}
+
+	if only != nil {
+		return !sc.matches(state, only)
+	}
+
+	return false
+}
+
+func (sc *skipChecker) matches(state func() git.State, value any) bool {
+	switch typedValue := value.(type) {
+	case bool:
+		return typedValue
+	case string:
+		return typedValue == state().State
+	case []any:
+		return sc.matchesSlices(state, typedValue)
+	}
+	return false
+}
+
+func (sc *skipChecker) matchesSlices(gitState func() git.State, slice []any) bool {
+	for _, state := range slice {
+		switch typedState := state.(type) {
+		case string:
+			if typedState == gitState().State {
+				return true
+			}
+		case map[string]any:
+			if sc.matchesRef(gitState, typedState) {
+				return true
+			}
+
+			if sc.matchesCommands(typedState) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (sc *skipChecker) matchesRef(state func() git.State, typedState map[string]any) bool {
+	ref, ok := typedState["ref"].(string)
+	if !ok {
+		return false
+	}
+
+	branch := state().Branch
+	if ref == branch {
+		return true
+	}
+
+	g := glob.MustCompile(ref)
+
+	return g.Match(branch)
+}
+
+func (sc *skipChecker) matchesCommands(typedState map[string]any) bool {
+	commandLine, ok := typedState["run"].(string)
+	if !ok {
+		return false
+	}
+
+	result := sc.exec.execute(commandLine)
+
+	log.Builder(log.DebugLevel, "[hookflow] ").
+		Add("skip/only: ", commandLine).
+		Add("result:    ", result).
+		Log()
+
+	return result
+}

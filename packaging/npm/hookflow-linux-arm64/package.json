@@ -1,0 +1,22 @@
+{
+  "name": "hookflow-linux-arm64",
+  "version": "1.0.0",
+  "description": "The Linux ARM 64-bit binary for hookflow, git hooks manager.",
+  "preferUnplugged": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekintian/hookflow.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tekintian/hookflow/issues",
+    "email": "tekintian@gmail.com"
+  },
+  "homepage": "https://github.com/tekintian/hookflow#readme",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ]
+}

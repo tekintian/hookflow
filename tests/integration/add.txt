@@ -1,0 +1,13 @@
+[windows] skip
+
+exec git init
+exec hookflow add pre-commit
+! stderr .
+exists .git/hooks/pre-commit
+! exists .hookflow/pre-commit
+
+exec hookflow add pre-push --dirs
+! stderr .
+exists .git/hooks/pre-push
+exists .hookflow/pre-push
+exists .hookflow-local/pre-push

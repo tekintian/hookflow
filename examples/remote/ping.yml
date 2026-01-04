@@ -1,0 +1,15 @@
+# Test `remotes` config of hookflow.
+#
+# # hookflow.yml
+#
+# remotes:
+#   - git_url: git@github.com:tekintian/hookflow
+#     configs:
+#       - examples/remote/ping.yml
+#
+# $ hookflow run pre-commit
+
+pre-commit:
+  commands:
+    ping:
+      run: echo pong

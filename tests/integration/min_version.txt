@@ -1,0 +1,10 @@
+exec git init
+! exec hookflow run pre-commit
+stdout 'required hookflow version \(v13.1.1\) is higher than current'
+
+-- hookflow.yml --
+min_version: v13.1.1
+pre-commit:
+  commands:
+    echo:
+      run: echo

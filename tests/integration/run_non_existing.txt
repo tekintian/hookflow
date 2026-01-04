@@ -1,0 +1,8 @@
+exec git init
+exec hookflow run pre-commit
+! stdout 'Error.*'
+! exec hookflow run no-a-hook
+stdout 'Error.*'
+
+-- hookflow.yml --
+# empty

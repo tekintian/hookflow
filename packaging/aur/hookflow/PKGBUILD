@@ -1,0 +1,28 @@
+# Maintainer: Hookflow <tekintian@gmail.com>
+
+pkgname=hookflow
+pkgdesc="Git hooks manager"
+pkgver=1.0.0
+pkgrel=1
+arch=('x86_64' 'aarch64')
+url="https://github.com/tekintian/hookflow"
+license=('MIT')
+makedepends=('go<=1.24')
+source=("https://github.com/tekintian/hookflow/archive/v${pkgver}.tar.gz")
+sha256sums=('{{ sha256sum }}')
+
+build() {
+  cd "$pkgname-$pkgver"
+  go build \
+    -trimpath \
+    -buildmode=pie \
+    -mod=readonly \
+    -modcacherw \
+    -ldflags "-linkmode external -extldflags \"${LDFLAGS}\"" \
+    .
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  install -Dm755 $pkgname "$pkgdir"/usr/bin/$pkgname
+}

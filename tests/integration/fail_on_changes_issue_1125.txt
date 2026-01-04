@@ -1,0 +1,20 @@
+exec git init
+exec git config user.email "you@example.com"
+exec git config user.name "Your Name"
+exec git add .
+exec git commit -m "firstcommit"
+exec hookflow install
+
+# This should fail because README.md is modified
+! exec hookflow run pre-commit --all-files
+stdout '│  Error: files were modified by a hook, and fail_on_changes is enabled'
+
+-- README.md --
+This is a readme.
+
+-- hookflow.yml --
+pre-commit:
+  fail_on_changes: true
+  jobs:
+    - name: test-job
+      run: echo 123 >> README.md

@@ -1,0 +1,4 @@
+exec git init
+exec hookflow install
+exists hookflow.yml
+! stderr .

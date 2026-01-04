@@ -1,0 +1,41 @@
+{
+  "name": "@tekintian/hookflow-installer",
+  "version": "1.0.0",
+  "description": "Simple git hooks manager",
+  "main": "bin/index.js",
+  "files": [
+    "install.js",
+    "schema.json"
+  ],
+  "bin": {
+    "hookflow": "bin/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekintian/hookflow.git"
+  },
+  "keywords": [
+    "git",
+    "hook",
+    "manager"
+  ],
+  "author": "mrexox",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tekintian/hookflow/issues",
+    "email": "tekintian@gmail.com"
+  },
+  "homepage": "https://github.com/tekintian/hookflow#readme",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "scripts": {
+    "install": "node install.js"
+  }
+}

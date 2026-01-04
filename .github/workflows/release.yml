@@ -1,0 +1,266 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+
+permissions:
+  attestations: write
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch all tags
+        run: git fetch --force --tags
+
+      - name: Setup Go 1.24 for macOS 10.15 compatibility
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: 'v2.10.2'
+          args: release --clean --verbose --skip=snapcraft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GO111MODULE: 'on'
+
+      - name: Generate artifact attestations
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-checksums: dist/hookflow_checksums.txt
+
+      - name: Preserve artifacts permissions with tar
+        run: tar -cvf dist.tar dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist.tar
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch --force --tags
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+      - run: tar -xvf dist.tar
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Publish to NPM
+        env:
+          NPM_API_KEY: ${{ secrets.NPM_API_KEY }}
+        run: |
+          cd packaging/
+          ruby pack.rb prepare
+          ruby pack.rb publish_npm
+
+  publish-gem:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch --force --tags
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+      - run: tar -xvf dist.tar
+
+      - name: Publish to Rubygems
+        env:
+          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+        run: |
+          mkdir -p ~/.gem/
+          cat << EOF > ~/.gem/credentials
+          ---
+          :rubygems_api_key: ${RUBYGEMS_API_KEY}
+          EOF
+          chmod 0600 ~/.gem/credentials
+          cd packaging/
+          ruby pack.rb prepare
+          ruby pack.rb publish_gem
+
+  publish-pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch --force --tags
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+      - run: tar -xvf dist.tar
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --upgrade pip twine wheel setuptools
+
+      - name: Publish to PyPI
+        env:
+          PYPI_API_KEY: ${{ secrets.PYPI_API_KEY }}
+        run: |
+          cat << EOF > ~/.pypirc
+          [distutils]
+            index-servers =
+              hookflow
+
+          [hookflow]
+            repository = https://upload.pypi.org/legacy/
+            username = __token__
+            password = ${PYPI_API_KEY}
+          EOF
+          chmod 0600 ~/.pypirc
+          cd packaging/
+          ruby pack.rb prepare
+          ruby pack.rb publish_pypi
+
+  # publish-homebrew:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Update Homebrew formula
+  #       uses: dawidd6/action-homebrew-bump-formula@v3
+  #       with:
+  #         formula: hookflow
+  #         tap: tekintian/homebrew-hookflow
+  #         token: ${{ secrets.HOMEBREW_TOKEN }}
+
+  publish-winget:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish to Winget
+        uses: vedantmgoyal2009/winget-releaser@v2
+        with:
+          identifier: tekintian.hookflow
+          fork-user: tekintian
+          token: ${{ secrets.WINGET_TOKEN }}
+
+  publish-distro-packages:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+      - run: tar -xvf dist.tar
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --upgrade cloudsmith-cli
+
+      - name: Push packages to Cloudsmith
+        env:
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        run: |
+          cloudsmith push deb tekintian/hookflow/any-distro/any-version dist/hookflow_*_amd64.deb
+          cloudsmith push deb tekintian/hookflow/any-distro/any-version dist/hookflow_*_arm64.deb
+          cloudsmith push rpm tekintian/hookflow/any-distro/any-version dist/hookflow_*_amd64.rpm
+          cloudsmith push rpm tekintian/hookflow/any-distro/any-version dist/hookflow_*_arm64.rpm
+          cloudsmith push alpine tekintian/hookflow/alpine/any-version dist/hookflow_*_amd64.apk
+          cloudsmith push alpine tekintian/hookflow/alpine/any-version dist/hookflow_*_arm64.apk
+
+  # publish-aur_hookflow:
+  #   needs: build
+  #   if: ${{ false }}
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: archlinux:latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+
+  #     - name: Update AUR package
+  #       run: |
+  #         pacman -Syu --noconfirm
+  #         pacman -S --noconfirm openssh git ruby go base-devel
+
+  #         useradd -m -G wheel runner
+  #         echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+  #         chown -R runner:runner .
+
+  #         su runner -c '
+  #           mkdir -p ~/.ssh
+  #           echo "${{ secrets.AUR_SSH_KEY }}" > ~/.ssh/aur
+  #           chmod 600 ~/.ssh/aur
+  #           echo "Host aur.archlinux.org" >> ~/.ssh/config
+  #           echo "  IdentityFile ~/.ssh/aur" >> ~/.ssh/config
+  #           echo "  User aur" >> ~/.ssh/config
+  #           ssh-keyscan -H aur.archlinux.org >> ~/.ssh/known_hosts
+
+  #           ruby packaging/pack.rb publish_aur_hookflow
+  #         '
+
+  # publish-aur_hookflow-bin:
+  #   needs: build
+  #   if: ${{ false }}
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: archlinux:latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+
+  #     - name: Update AUR package
+  #       run: |
+  #         pacman -Syu --noconfirm
+  #         pacman -S --noconfirm openssh git ruby base-devel
+
+  #         useradd -m -G wheel runner
+  #         echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+  #         chown -R runner:runner .
+
+  #         su runner -c '
+  #           mkdir -p ~/.ssh
+  #           echo "${{ secrets.AUR_SSH_KEY }}" > ~/.ssh/aur
+  #           chmod 600 ~/.ssh/aur
+  #           echo "Host aur.archlinux.org" >> ~/.ssh/config
+  #           echo "  IdentityFile ~/.ssh/aur" >> ~/.ssh/config
+  #           echo "  User aur" >> ~/.ssh/config
+  #           ssh-keyscan -H aur.archlinux.org >> ~/.ssh/known_hosts
+
+  #           ruby packaging/pack.rb publish_aur_hookflow_bin
+  #         '

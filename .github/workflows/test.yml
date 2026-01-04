@@ -1,0 +1,87 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+name: Test
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Test
+        run: go test $(go list ./... | grep -v '/gen$') -coverprofile coverage.out
+      - name: Report coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unit
+          name: ${{ join(matrix.*, ' ') }}
+
+  test-integration:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      GOCOVERDIR: ${{ github.workspace }}/_icoverdir_
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Prepare hookflow
+        run: |
+          mkdir _icoverdir_
+          make install
+      - name: Run integration tests
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: go test integration_test.go -tags=integration
+      - name: Collect coverage
+        run: |
+          go tool covdata textfmt -i _icoverdir_ -o coverage.out
+      - name: Report coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: integration
+          name: integration-${{ join(matrix.*, ' ') }}
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Go 1.24 for macOS 10.15 compatibility
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      - name: Build binaries for macOS 10.15 compatibility
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --snapshot --skip=publish --skip=snapcraft --skip=validate --clean --verbose
+        env:
+          GO111MODULE: 'on'
+      - name: Tar binaries to preserve executable bit
+        run: 'tar -cvf hookflow-binaries.tar --directory dist/ $(find dist/ -executable -type f -printf "%P\0" | xargs --null)'
+      - name: Upload binaries as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Executables
+          path: hookflow-binaries.tar

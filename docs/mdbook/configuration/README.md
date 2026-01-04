@@ -1,0 +1,112 @@
+## Config file name
+
+Hookflow supports the following file names for the main config:
+
+| Format | File name |
+|-------|-----------|
+| YAML  | `hookflow.yml` |
+| YAML  | `.hookflow.yml` |
+| YAML  | `.config/hookflow.yml` |
+|       |              |
+| YAML  | `hookflow.yaml` |
+| YAML  | `.hookflow.yaml` |
+| YAML  | `.config/hookflow.yaml` |
+|       |              |
+| TOML  | `hookflow.toml` |
+| TOML  | `.hookflow.toml` |
+| TOML  | `.config/hookflow.toml` |
+|       |              |
+| JSON  | `hookflow.json` |
+| JSON  | `.hookflow.json` |
+| JSON  | `.config/hookflow.json` |
+
+If there are more than 1 file in the project, only one will be used, and you'll never know which one. So, please, use one format in a project.
+
+Filenames without the leading dot will also be looked up from the [`.config` subdirectory](https://github.com/pi0/config-dir).
+
+Hookflow also merges an extra config with the name `hookflow-local`. All supported formats can be applied to this `-local` config. If you name your main config with the leading dot, like `.hookflow.json`, the `-local` config also must be named with the leading dot: `.hookflow-local.json`.
+
+The `-local` config can be used without a main config file. This is useful when you want to use hookflow locally without imposing it on your teammates – just create a `hookflow-local.yml` file and add it to your global `.gitignore`.
+
+## Options
+
+- [`assert_hookflow_installed`](./assert_hookflow_installed.md)
+- [`colors`](./colors.md)
+- [`extends`](./extends.md)
+- [`hookflow`](./hookflow.md)
+- [`min_version`](./min_version.md)
+- [`no_tty`](./no_tty.md)
+- [`output`](./output.md)
+- [`rc`](./rc.md)
+- [`remotes`](./remotes.md)
+  - [`git_url`](./git_url.md)
+  - [`ref`](./ref.md)
+  - [`refetch`](./refetch.md)
+  - [`refetch_frequency`](./refetch_frequency.md)
+  - [`configs`](./configs.md)
+- [`source_dir`](./source_dir.md)
+- [`source_dir_local`](./source_dir_local.md)
+- [`skip_lfs`](./skip_lfs.md)
+- [`templates`](./templates.md)
+- [{Git hook name}](./Hook.md) (e.g. `pre-commit`)
+  - [`files` (global)](./files-global.md)
+  - [`parallel`](./parallel.md)
+  - [`piped`](./piped.md)
+  - [`follow`](./follow.md)
+  - [`fail_on_changes`](./fail_on_changes.md)
+  - [`fail_on_changes_diff`](./fail_on_changes_diff.md)
+  - [`exclude_tags`](./exclude_tags.md)
+  - [`exclude`](./exclude.md)
+  - [`skip`](./skip.md)
+  - [`only`](./only.md)
+  - [`jobs`](./jobs.md)
+    - [`name`](./name.md)
+    - [`run`](./run.md)
+    - [`script`](./script.md)
+    - [`runner`](./runner.md)
+    - [`args`](./args.md)
+    - [`group`](./group.md)
+      - [`parallel`](./parallel.md)
+      - [`piped`](./piped.md)
+      - [`jobs`](./jobs.md)
+    - [`skip`](./skip.md)
+    - [`only`](./only.md)
+    - [`tags`](./tags.md)
+    - [`glob`](./glob.md)
+    - [`files`](./files.md)
+    - [`file_types`](./file_types.md)
+    - [`env`](./env.md)
+    - [`root`](./root.md)
+    - [`exclude`](./exclude.md)
+    - [`fail_text`](./fail_text.md)
+    - [`stage_fixed`](./stage_fixed.md)
+    - [`interactive`](./interactive.md)
+    - [`use_stdin`](./use_stdin.md)
+  - [`commands`](./Commands.md)
+    - [`run`](./run.md)
+    - [`skip`](./skip.md)
+    - [`only`](./only.md)
+    - [`tags`](./tags.md)
+    - [`glob`](./glob.md)
+    - [`files`](./files.md)
+    - [`file_types`](./file_types.md)
+    - [`env`](./env.md)
+    - [`root`](./root.md)
+    - [`exclude`](./exclude.md)
+    - [`fail_text`](./fail_text.md)
+    - [`stage_fixed`](./stage_fixed.md)
+    - [`interactive`](./interactive.md)
+    - [`use_stdin`](./use_stdin.md)
+    - [`priority`](./priority.md)
+  - [`scripts`](./Scripts.md)
+    - [`runner`](./runner.md)
+    - [`args`](./args.md)
+    - [`skip`](./skip.md)
+    - [`only`](./only.md)
+    - [`tags`](./tags.md)
+    - [`env`](./env.md)
+    - [`fail_text`](./fail_text.md)
+    - [`stage_fixed`](./stage_fixed.md)
+    - [`interactive`](./interactive.md)
+    - [`use_stdin`](./use_stdin.md)
+    - [`priority`](./priority.md)

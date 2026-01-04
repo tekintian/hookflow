@@ -1,0 +1,184 @@
+version: 2
+project_name: hookflow
+before:
+  hooks:
+    - go generate ./...
+builds:
+  # Builds the binaries without `hookflow upgrade`
+  - id: no_self_update
+    tags:
+      - no_self_update
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+      - 386
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: linux
+        goarch: 386
+      - goos: freebsd
+        goarch: 386
+      - goos: openbsd
+        goarch: 386
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/tekintian/hookflow/internal/version.commit={{.Commit}}
+
+  # Full hookflow binary
+  - id: hookflow
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+      - 386
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: linux
+        goarch: 386
+      - goos: freebsd
+        goarch: 386
+      - goos: openbsd
+        goarch: 386
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/tekintian/hookflow/internal/version.commit={{.Commit}}
+
+  - id: hookflow-linux-aarch64
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/tekintian/hookflow/internal/version.commit={{.Commit}}
+
+archives:
+  - id: hookflow
+    formats: [binary]
+    ids:
+      - hookflow
+    files:
+      - none*
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- if eq .Os "darwin" }}MacOS
+      {{- else }}{{ title .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+
+  - id: hookflow-gz
+    formats: [gz]
+    ids:
+      - hookflow
+    files:
+    - none*
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- if eq .Os "darwin" }}MacOS
+      {{- else }}{{ title .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+
+  - id: hookflow-linux-aarch64
+    formats: [binary]
+    ids:
+      - hookflow-linux-aarch64
+    files:
+      - none*
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- if eq .Os "darwin" }}MacOS
+      {{- else }}{{ title .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else if eq .Arch "arm64" }}aarch64
+      {{- else }}{{ .Arch }}{{ end }}
+
+  - id: hookflow-linux-aarch64-gz
+    formats: [gz]
+    ids:
+      - hookflow-linux-aarch64
+    files:
+      - none*
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- if eq .Os "darwin" }}MacOS
+      {{- else }}{{ title .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else if eq .Arch "arm64" }}aarch64
+      {{- else }}{{ .Arch }}{{ end }}
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ .Tag }}"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+    - '^spec:'
+    - '^tmp:'
+    - '^context:'
+    - '^\d+\.\d+\.\d+:'
+
+# snapcrafts:
+#   - summary: Fast and powerful Git hooks manager for any type of projects.
+#     description: |
+#       Hookflow is a single dependency-free binary to manage all your git hooks. It works with any language in any environment, and in all common team workflows.
+#     grade: stable
+#     confinement: classic
+#     publish: false
+#     license: MIT
+#     name: tekintian
+#     ids:
+#       - no_self_update
+
+nfpms:
+  - file_name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    homepage:  https://github.com/tekintian/hookflow
+    description: Hookflow a single dependency-free binary to manage all your git hooks that works with any language in any environment, and in all common team workflows
+    maintainer: tekintian <hookflow@tekintian.com>
+    license: MIT
+    vendor: tekintian
+    ids:
+      - no_self_update
+    formats:
+      - apk
+      - deb
+      - rpm
+    dependencies:
+      - git

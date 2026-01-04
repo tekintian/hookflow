@@ -1,0 +1,27 @@
+exec git init
+exec hookflow install
+exec git config user.email "you@example.com"
+exec git config user.name "Your Name"
+exec git add -A
+exec git commit -m 'must show debug logs'
+stderr 'injected'
+stdout '[hookflow]'
+
+-- hookflow.yml --
+hookflow: |
+  echo 'injected'
+  hookflow
+
+output:
+  - execution_out
+
+pre-commit:
+  jobs:
+    - run: echo {all_files}
+      glob: "*.txt"
+
+-- file.txt --
+sometext
+
+-- file.js --
+somecode
