@@ -1,5 +1,5 @@
 {
-  "name": "hookflow-freebsd-arm64",
+  "name": "@tekintian/hookflow-freebsd-arm64",
   "version": "1.0.0",
   "description": "The FreeBSD ARM 64-bit binary for hookflow, git hooks manager.",
   "preferUnplugged": false,

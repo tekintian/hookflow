@@ -1,5 +1,5 @@
 {
-  "name": "hookflow-windows-x64",
+  "name": "@tekintian/hookflow-windows-x64",
   "version": "1.0.0",
   "description": "The Windows 64-bit binary for hookflow, git hooks manager.",
   "preferUnplugged": false,

@@ -1,5 +1,5 @@
 {
-  "name": "hookflow",
+  "name": "@tekintian/hookflow",
   "version": "1.0.0",
   "description": "Simple git hooks manager",
   "repository": {
@@ -28,16 +28,16 @@
   },
   "homepage": "https://github.com/tekintian/hookflow#readme",
   "optionalDependencies": {
-    "hookflow-darwin-arm64": "1.0.0",
-    "hookflow-darwin-x64": "1.0.0",
-    "hookflow-linux-arm64": "1.0.0",
-    "hookflow-linux-x64": "1.0.0",
-    "hookflow-freebsd-arm64": "1.0.0",
-    "hookflow-freebsd-x64": "1.0.0",
-    "hookflow-openbsd-arm64": "1.0.0",
-    "hookflow-openbsd-x64": "1.0.0",
-    "hookflow-windows-arm64": "1.0.0",
-    "hookflow-windows-x64": "1.0.0"
+    "@tekintian/hookflow-darwin-arm64": "1.0.0",
+    "@tekintian/hookflow-darwin-x64": "1.0.0",
+    "@tekintian/hookflow-linux-arm64": "1.0.0",
+    "@tekintian/hookflow-linux-x64": "1.0.0",
+    "@tekintian/hookflow-freebsd-arm64": "1.0.0",
+    "@tekintian/hookflow-freebsd-x64": "1.0.0",
+    "@tekintian/hookflow-openbsd-arm64": "1.0.0",
+    "@tekintian/hookflow-openbsd-x64": "1.0.0",
+    "@tekintian/hookflow-windows-arm64": "1.0.0",
+    "@tekintian/hookflow-windows-x64": "1.0.0"
   },
   "scripts": {
     "postinstall": "node postinstall.js"

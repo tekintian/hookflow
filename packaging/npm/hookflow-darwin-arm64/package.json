@@ -1,5 +1,5 @@
 {
-  "name": "hookflow-darwin-arm64",
+  "name": "@tekintian/hookflow-darwin-arm64",
   "version": "1.0.0",
   "description": "The macOS ARM 64-bit binary for hookflow, git hooks manager.",
   "preferUnplugged": false,

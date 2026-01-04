@@ -1,5 +1,5 @@
 {
-  "name": "hookflow-linux-arm64",
+  "name": "@tekintian/hookflow-linux-arm64",
   "version": "1.0.0",
   "description": "The Linux ARM 64-bit binary for hookflow, git hooks manager.",
   "preferUnplugged": false,

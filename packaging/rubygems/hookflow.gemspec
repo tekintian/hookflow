@@ -15,7 +15,8 @@ Gem::Specification.new do |spec|
   spec.files = %w(
     lib/hookflow.rb
     bin/hookflow
-  ) + `find libexec/ -executable -type f -print0`.split("\x0")
+    libexec/.keep
+  ) + Dir["libexec/**/*"]
 
   spec.licenses = ['MIT']
 end

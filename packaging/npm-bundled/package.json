@@ -1,5 +1,5 @@
 {
-  "name": "hookflow",
+  "name": "@tekintian/hookflow",
   "version": "1.0.0",
   "description": "Simple git hooks manager",
   "main": "bin/index.js",

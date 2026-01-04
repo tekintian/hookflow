@@ -37,7 +37,7 @@ module Pack
       replace_in_file(package_json, /"version": "[\d.]+"/, %{"version": "#{VERSION}"})
     end
 
-    replace_in_file("npm/hookflow/package.json", /"(hookflow-.+)": "[\d.]+"/, %{"\\1": "#{VERSION}"})
+    replace_in_file("npm/hookflow/package.json", /"(@tekintian\/hookflow-.+)": "[\d.]+"/, %{"\\1": "#{VERSION}"})
     replace_in_file("rubygems/hookflow.gemspec", /(spec\.version\s+= ).*/, %{\\1"#{VERSION}"})
     replace_in_file("pypi/setup.py", /(version+=).*/, %{\\1'#{VERSION}',})
     replace_in_file("aur/hookflow/PKGBUILD", /(pkgver+=).*/, %{\\1#{VERSION}})

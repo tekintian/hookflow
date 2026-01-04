@@ -1,5 +1,5 @@
 {
-  "name": "hookflow-linux-x64",
+  "name": "@tekintian/hookflow-linux-x64",
   "version": "1.0.0",
   "description": "The Linux 64-bit binary for hookflow, git hooks manager.",
   "preferUnplugged": false,
